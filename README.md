@@ -1,1 +1,457 @@
 # DBMS-Art-Museum-Database
+
+Consider a database to keep track of information for an art museum with  the following 
+requirements : <br>
+
+The museum has a collection of ART_OBJECTS. Each ART_OBJECT has a unique Id_no, 
+an Artist (if known), a Year (when it was created, if known), a Title, and a Description. The 
+art objects are categorized in several ways, as discussed below. <br>
+1. ART_OBJECTS are categorized based on their type. There are three main types—
+ PAINTING, SCULPTURE, and STATUE—plus another type called OTHER to 
+accommodate objects that do not fall into one of the three main types.  <br> <br>
+2. A PAINTING has a Paint_type (oil, watercolor, etc.), material on which it is Drawn_on 
+(paper, canvas, wood, etc.), and Style (modern, abstract, etc.). <br> <br> 
+3. A SCULPTURE or a statue has a Material from which it was created (wood, stone, 
+etc.), Height, Weight, and Style.  <br> <br>
+4. An art object in the OTHER category has a Type (print, photo, etc.) and Style. <br>
+ART_OBJECTs are categorized as either PERMANENT_COLLECTION (objects that 
+are owned by the museum) and BORROWED. <br> Information captured about objects 
+in the PERMANENT_COLLECTION includes Date_acquired, Status (on display, on 
+loan, or stored), and Cost. <br> Information captured about ORROWED objects includes 
+the Collection from which it was borrowed, Date_borrowed, and Date_returned.  <br> <br>
+5. Information describing the country or culture of Origin (Italian, Egyptian, 
+American, Indian, and so forth) and Epoch (Renaissance, Modern, Ancient, and 
+so forth) is captured for each  T_OBJECT.  <br> <br>
+6. The museum keeps track of ARTIST information, if known: Name, DateBorn (if 
+known), Date_died (if not living), Country_of_origin, Epoch, Main_style, and Description. 
+The Name is assumed to be unique.  <br> <br>
+7. Different EXHIBITIONS occur, each having a Name, Start_date, and End_date. 
+EXHIBITIONS are related to all the art objects that were on display during the 
+exhibition.  <br> <br> 
+8. Information is kept on other COLLECTIONS with which the museum interacts; this 
+information includes Name (unique), Type (museum,  personal, etc.), Description, 
+Address, Phone, and current Contact_person.  <br> <br>
+Design an entity–relationship diagram for the mail-order database and Convert it into a 
+Schema diagram.  
+  <br> <br>
+
+Identify the appropriate functional requirements for the above database, write the SQL 
+queries, and show the results.  <br> <br>
+
+### SQL code
+#### creating tables
+```sql
+Drop table ARTIST cascade constraint;
+Drop table ART_OBJECT cascade constraint;
+Drop table COLLECTION cascade constraint;
+Drop table EXHIBITION cascade constraint;
+Drop table BORROWED_COLLECTION cascade constraint;
+Drop table PERMANENT_COLLECTION cascade constraint;
+Drop table STATUE cascade constraint;
+Drop table OTHER cascade constraint;
+Drop table PAINTING cascade constraint;
+Drop table SCULPTURE cascade constraint;
+
+CREATE TABLE ARTIST (
+    NAME VARCHAR(255) PRIMARY KEY,
+    DATEBORN INT,
+    DATE_DIED INT,
+    MAIN_STYLE VARCHAR(255),
+    DESCRIPTION VARCHAR(255),
+    EPOCH VARCHAR(255),
+    COUNTRY_OF_ORIGIN VARCHAR(255)
+);
+
+CREATE TABLE ART_OBJECT (
+    ID_NO INT PRIMARY KEY,
+    YEAR INT,
+    TITLE VARCHAR(255),
+    DESCRIPTION VARCHAR(255),
+    STYLE VARCHAR(255),
+    ORIGIN VARCHAR(255),
+    ARTIST_NAME VARCHAR(255),
+    FOREIGN KEY (ARTIST_NAME) REFERENCES ARTIST(NAME)
+);
+
+CREATE TABLE EXHIBITION (
+    NAME VARCHAR(255) PRIMARY KEY,
+    START_DATE VARCHAR(255),
+    END_DATE VARCHAR(255),
+    ART_OBJ_ID INT,
+    FOREIGN KEY (ART_OBJ_ID) REFERENCES ART_OBJECT(ID_NO)
+);
+
+CREATE TABLE COLLECTION (
+    NAME VARCHAR(255) PRIMARY KEY,
+    ART_OBJ_ID INT,
+    TYPE VARCHAR(255),
+    DESCRIPTION VARCHAR(255),
+    CONTACT_PERSON VARCHAR(255),
+    PHONE VARCHAR(255),
+    ADDRESS VARCHAR(255),
+    FOREIGN KEY (ART_OBJ_ID) REFERENCES ART_OBJECT(ID_NO)
+);
+
+CREATE TABLE BORROWED_COLLECTION (
+    BORROWED_ID VARCHAR(255) PRIMARY KEY,
+    DATE_RETURNED VARCHAR(255),
+    ART_OBJ_ID INT,
+    DATE_BORROWED VARCHAR(255),
+    FOREIGN KEY (ART_OBJ_ID) REFERENCES ART_OBJECT(ID_NO)
+);
+
+CREATE TABLE PERMANENT_COLLECTION (
+    DATE_AQUIRED VARCHAR(255) ,
+    PERMANENT_ID VARCHAR(255) PRIMARY KEY,
+    STATUS INT,
+    COST INT,
+    ART_OBJ_ID INT,
+    FOREIGN KEY (ART_OBJ_ID) REFERENCES ART_OBJECT(ID_NO)
+);
+
+CREATE TABLE STATUE (
+    ART_OBJ_ID INT,
+    STYLE VARCHAR(255),
+    HEIGHT FLOAT,
+    WEIGHT FLOAT,
+    MATERIAL VARCHAR(255),
+    FOREIGN KEY (ART_OBJ_ID) REFERENCES ART_OBJECT(ID_NO),
+    PRIMARY KEY(ART_OBJ_ID,STYLE)
+);
+
+CREATE TABLE SCULPTURE (
+    ART_OBJ_ID INT,
+    STYLE VARCHAR(255),
+    HEIGHT FLOAT,
+    WEIGHT INT,
+    MATERIAL VARCHAR(255),
+    FOREIGN KEY (ART_OBJ_ID) REFERENCES ART_OBJECT(ID_NO),
+    PRIMARY KEY(ART_OBJ_ID,STYLE)
+);
+
+CREATE TABLE PAINTING (
+    ART_OBJ_ID INT,
+    STYLE VARCHAR(255),
+    DRAWN_ON VARCHAR(255),
+    PAINT_TYPE VARCHAR(255),
+    FOREIGN KEY (ART_OBJ_ID) REFERENCES ART_OBJECT(ID_NO),
+    PRIMARY KEY(ART_OBJ_ID,STYLE)
+
+);
+
+CREATE TABLE OTHER (
+    ART_OBJ_ID INT,
+    STYLE VARCHAR(255),
+    TYPE VARCHAR(255),
+    FOREIGN KEY (ART_OBJ_ID) REFERENCES ART_OBJECT(ID_NO),
+    PRIMARY KEY(ART_OBJ_ID,STYLE)
+);
+```
+#### Inserting data
+```sql
+INSERT INTO ARTIST VALUES ('Pablo Picasso', 1881, 1973,
+'Cubism','Co-founder of the Cubist movement.', '20th century modern art ','Spain');
+INSERT INTO ARTIST VALUES ('Michelangelo', 1475 ,1564,
+'Renaissance','One of the greatest artists of all time.', 'High Renaissance','Italy');
+INSERT INTO ARTIST VALUES ('Vincent van Gogh', 1853 ,1890,'Post-Impressionism',
+'Famous artistof the Post-Impressionist movement.','19th century modern art',' Netherlands');
+INSERT INTO ARTIST VALUES ('Auguste Rodin', 1840 ,1917,'Impressionism',
+'Best known for his bronze statue "The Thinker".','19th century modern art',' France');
+INSERT INTO ARTIST VALUES ('Leonardo da Vinci', 1452, 1519,'Renaissance',
+'Polymath and one of the greatest artists of all time.','High Renaissance','Italy');
+INSERT INTO ARTIST VALUES ('Henry Moore', 1898,1986 ,'Modernist',
+'Best known for his abstract bronze sculptures.','20th century modern art ','England');
+INSERT INTO ARTIST VALUES ('Rembrandt van Rijn', 1606 ,1669, 'Baroque',
+'A leading Dutch master of the Baroque era.','Dutch Golden Age','Netherlands');
+INSERT INTO ARTIST VALUES ('Pharaoh Khafre', 1809 ,1890,' Ancient','Egyptian A Pharaoh of ancient Egypt,
+Old Kingdom Egyptknown for his reign during which the Great Sphinx of Giza was built.','Old Kingdom ','Egypt');
+INSERT INTO ARTIST VALUES ('Yoko Ono', 1933 ,1998,'Conceptual',
+'A multimedia artist and peace activist',' 20th century modern art','Japan');
+INSERT INTO ARTIST VALUES ('Banksy',1975,NULL,'Street art','A pseudonymous England-based street artist',
+' 21st century modern art','England');
+INSERT INTO ARTIST VALUES ('Johannes Vermeer', 1632, 1675,'Baroque','A Dutch master of the Baroque era.',
+'Dutch Golden Age ','Netherlands');
+INSERT INTO ARTIST VALUES ('Edvard Munch', 1863 ,1944,'Expressionism',
+'A leading figure of the Expressionist movement.','19th/20th century modern art','Norway' );
+INSERT INTO ARTIST VALUES ('Antonio Canova', 1757 ,1822,'Neoclassicism',
+'A leading sculptor of the Neoclassical period.',' 19th century modern art','Italy');
+INSERT INTO ARTIST VALUES ('Henri Matisse', 1869, 1954,'Fauvism',
+'A pioneer of the Fauvist movement 20th century modern art','20th century modern art','France');
+INSERT INTO ARTIST VALUES ('Grant Wood', 1891, 1942,'Regionalism',
+'A leading figure of the Regionalist art movement in the US.','20th century modern art','US');
+INSERT INTO ARTIST VALUES ('Frida Kahlo', 1907, 1954, 'Surrealism', 
+'A self-taught painter and leading figure in Mexican folk art.','20th century modern art','Mexico');
+INSERT INTO ARTIST VALUES ('John William Waterhouse', 1849, 1917,'PreRaphaelite',
+'A leading member of the Pre-Raphaelite Brotherhood',' Victorian era','England');
+INSERT INTO ARTIST VALUES ('Salvador Dali', 1904, 1989,'Surrealism',
+'A leading figure in the Surrealist movement.',' 20th century modern art','Spain');
+INSERT INTO ARTIST VALUES ('Rene Magritte', 1898, 1967,
+'Surrealism','A leading figure in the Surrealist movement.','20th century modern art','Belgian');
+INSERT INTO ARTIST VALUES ('Edward Hopper', 1882, 1967,'Realism',
+'A leading American realist painter and printmaker.','20th century modern art',' US');
+
+INSERT INTO ART_OBJECT VALUES (1,1937,'Guernica','Oil painting','Modern','Spanish ','Pablo Picasso');
+INSERT INTO ART_OBJECT VALUES (2,1501 ,'David','Marble statue','Renaissance','Italian','Michelangelo');
+INSERT INTO ART_OBJECT VALUES (3,1889,'The Starry Night','Oil painting','Post-Impressionist ','Dutch','Vincent van Gogh');
+INSERT INTO ART_OBJECT VALUES (4,1881,'The Thinker','Bronze sculpture ','Modern','French','Auguste Rodin');
+INSERT INTO ART_OBJECT VALUES (5,1498,'The Last Supper ','Fresco painting','Renaissance','Italian','Leonardo da Vinci');
+INSERT INTO ART_OBJECT VALUES (6,1944,'Reclining Figure','Sculpture ','Modern','British ','Henry Moore');
+INSERT INTO ART_OBJECT VALUES (7,1642 ,'Night Watch ','Oil painting','Baroque','Dutch','Rembrandt van Rijn');
+INSERT INTO ART_OBJECT VALUES (8,1500,'Egyptian Sphinx','Statue ','Ancient','Egypt ','Pharaoh Khafre');
+INSERT INTO ART_OBJECT VALUES (9,1966,'Cut Piece ','Other','Conceptual','Japan ','Yoko Ono');
+INSERT INTO ART_OBJECT VALUES (10,2010,'Girl with Balloon ','Spray Painting','Street Art','London','Banksy');
+INSERT INTO ART_OBJECT VALUES (11,1665 ,'Girl with pearl Earring','Painting','Dutch Golden Age ','Mauritshuis','Johannes Vermeer');
+INSERT INTO ART_OBJECT VALUES (12,1893,'The Scream','Painting','Expressionism','Norway','Edvard Munch');
+INSERT INTO ART_OBJECT VALUES (13,1803,'Psyche Revived by Cupid’s Kiss','Sculpture ','Neoclassicism','Paris','Antonio Canova');
+INSERT INTO ART_OBJECT VALUES (14,1953 ,'The Snail','Painting','Fauvism','African ','Henri Matisse');
+INSERT INTO ART_OBJECT VALUES (15,1930 ,'American Gothic','Oil painting','Regionalism ','American','Grant Wood');
+INSERT INTO ART_OBJECT VALUES (16,1929,'The Two Fridas','Painting','Surrealism','Mexican','Frida Kahlo');
+INSERT INTO ART_OBJECT VALUES (17,1888,'The Lady of Shallot','Oil painting','Pre-Raphaelitism','English ','John William Waterhouse');
+INSERT INTO ART_OBJECT VALUES (18,1931 ,'The Persistence of Memory ','Oil painting','Surrealism','Spanish ','Salvador Dali');
+INSERT INTO ART_OBJECT VALUES (19,1964,'The son of Man','Oil painting','Surrealism','Belgian','Rene Magritte');
+INSERT INTO ART_OBJECT VALUES (20,1942,'Nighthawks','Oil painting','Realism','American  ','Edward Hopper');
+
+INSERT INTO PAINTING VALUES (1,'Modern','Canvas','Oil');
+INSERT INTO PAINTING VALUES (3,'Renaissance','Canvas','Oil'); 
+INSERT INTO PAINTING VALUES (5,'Renaissance','Wall','Fresco');
+INSERT INTO PAINTING VALUES (7,'Baroque','Canvas','Oil');
+INSERT INTO PAINTING VALUES (10,'Street Art', 'Wall','Spray');
+INSERT INTO PAINTING VALUES (11,'Dutch Golden Age' ,'Wall','Spray');
+INSERT INTO PAINTING VALUES (12,'Expressionism' ,'Canvas','Oil');
+INSERT INTO PAINTING VALUES (14,'Fauvism' ,'Canvas','Fresco');
+INSERT INTO PAINTING VALUES (15,'Regionalism' ,'Canvas','Oil');
+INSERT INTO PAINTING VALUES (16,'Surrealism' ,'Canvas','Oil');
+INSERT INTO PAINTING VALUES (17,'Pre-Raphaelitism' ,'Canvas','Oil'); 
+INSERT INTO PAINTING VALUES (18,'Surrealism' ,'Canvas','Oil');
+INSERT INTO PAINTING VALUES (19,'Surrealism' ,'Wall','Oil');
+INSERT INTO PAINTING VALUES (20,'Realism' ,'Canvas','Oil'); 
+
+INSERT INTO SCULPTURE VALUES (4,'Modern', 1.2, 162,'Bronze');
+INSERT INTO SCULPTURE VALUES (6,'Modern', 2.6, 460,'Bronze'); 
+INSERT INTO SCULPTURE VALUES (13,'Neoclassicism', 1.75, 567,'Marble');
+
+INSERT INTO OTHER VALUES (9 ,'Conceptual',' ');
+
+INSERT INTO STATUE VALUES (2,'Renaissance',5.17, 635,'marble');
+INSERT INTO STATUE VALUES (8,'Ancient',20,987,'marble');
+ 
+INSERT INTO COLLECTION (NAME, ART_OBJ_ID, TYPE, DESCRIPTION, CONTACT_PERSON, PHONE, ADDRESS) 
+VALUES ('Museum of modern art',1,'Painting','Collection of modern masterpieces','James','45699875',
+'53rd St, New York, NY 10019');
+
+INSERT INTO COLLECTION (NAME, ART_OBJ_ID, TYPE, DESCRIPTION, CONTACT_PERSON, PHONE, ADDRESS) 
+VALUES ('National Gallery',3,'Painting','Collection of Impressionist masterpieces','Johnson','875535688',
+'123main street, LONDON');
+
+INSERT INTO COLLECTION (NAME, ART_OBJ_ID, TYPE, DESCRIPTION, CONTACT_PERSON, PHONE, ADDRESS) 
+VALUES ('Metropolitan Museum',5,'Painting','Renaissance','Emily smith','44567932','456 Park Ave, NY, NY 10003');
+
+INSERT INTO EXHIBITION VALUES('Paris international exhibition','2023-07-09','2023-01-14',1);
+INSERT INTO EXHIBITION VALUES('Renaissance Masterpieces','2019-05-15','2019-07-24',2);
+INSERT INTO EXHIBITION VALUES('Modern art show','2022-11-01','2022-12-01',4);
+
+INSERT INTO PERMANENT_COLLECTION (DATE_AQUIRED, PERMANENT_ID, STATUS, COST, ART_OBJ_ID)
+VALUES ('01-01-2021', 'P01', 1, 200000, 1);
+
+INSERT INTO PERMANENT_COLLECTION (DATE_AQUIRED, PERMANENT_ID, STATUS, COST, ART_OBJ_ID)
+VALUES ('05-04-2022', 'P02', 2, 150000, 2);
+
+INSERT INTO PERMANENT_COLLECTION (DATE_AQUIRED, PERMANENT_ID, STATUS, COST, ART_OBJ_ID)
+VALUES ('16-09-2018', 'P03', 4, 100000, 4);
+
+INSERT INTO PERMANENT_COLLECTION (DATE_AQUIRED, PERMANENT_ID, STATUS, COST, ART_OBJ_ID)
+VALUES ('22-11-2020', 'P04', 8, 340000, 8);
+
+INSERT INTO PERMANENT_COLLECTION (DATE_AQUIRED, PERMANENT_ID, STATUS, COST, ART_OBJ_ID)
+VALUES ('17-03-2000', 'P05', 12, 100000, 12);
+
+INSERT INTO PERMANENT_COLLECTION (DATE_AQUIRED, PERMANENT_ID, STATUS, COST, ART_OBJ_ID)
+VALUES ('29-01-2014', 'P06', 13, 88000, 13);
+
+INSERT INTO PERMANENT_COLLECTION (DATE_AQUIRED, PERMANENT_ID, STATUS, COST, ART_OBJ_ID)
+VALUES ('09-06-2004', 'P07', 16, 150000, 16);
+
+INSERT INTO PERMANENT_COLLECTION (DATE_AQUIRED, PERMANENT_ID, STATUS, COST, ART_OBJ_ID)
+VALUES ('30-05-2022', 'P08', 18, 230000, 18);
+
+INSERT INTO PERMANENT_COLLECTION (DATE_AQUIRED, PERMANENT_ID, STATUS, COST, ART_OBJ_ID)
+VALUES ('04-08-2003', 'P09', 20, 1200000, 20);
+
+INSERT INTO BORROWED_COLLECTION (BORROWED_ID, DATE_RETURNED, ART_OBJ_ID, DATE_BORROWED)
+VALUES ('B01', '15-12-2021', 3, '15-12-2020');
+
+INSERT INTO BORROWED_COLLECTION (BORROWED_ID, DATE_RETURNED, ART_OBJ_ID, DATE_BORROWED)
+VALUES ('B02', '09-12-2018', 5, '08-04-2018');
+
+INSERT INTO BORROWED_COLLECTION (BORROWED_ID, DATE_RETURNED, ART_OBJ_ID, DATE_BORROWED)
+VALUES ('B03', '05-05-2022', 6, '11-09-2019');
+
+INSERT INTO BORROWED_COLLECTION (BORROWED_ID, DATE_RETURNED, ART_OBJ_ID, DATE_BORROWED)
+VALUES ('B04', '12-12-2020', 7, '12-09-2020');
+
+INSERT INTO BORROWED_COLLECTION (BORROWED_ID, DATE_RETURNED, ART_OBJ_ID, DATE_BORROWED)
+VALUES ('B05', '25-12-2022', 9, '17-11-2015');
+
+INSERT INTO BORROWED_COLLECTION (BORROWED_ID, DATE_RETURNED, ART_OBJ_ID, DATE_BORROWED)
+VALUES ('B06', '15-07-2015', 10, '09-09-2012');
+
+INSERT INTO BORROWED_COLLECTION (BORROWED_ID, DATE_RETURNED, ART_OBJ_ID, DATE_BORROWED)
+VALUES ('B07', '11-05-2022', 11, '11-05-2020');
+
+INSERT INTO BORROWED_COLLECTION (BORROWED_ID, DATE_RETURNED, ART_OBJ_ID, DATE_BORROWED)
+VALUES ('B08', '01-01-2023', 14, '14-04-2021');
+
+INSERT INTO BORROWED_COLLECTION (BORROWED_ID, DATE_RETURNED, ART_OBJ_ID, DATE_BORROWED)
+VALUES ('B09', '05-05-2020', 15, '15-05-2005');
+
+INSERT INTO BORROWED_COLLECTION (BORROWED_ID, DATE_RETURNED, ART_OBJ_ID, DATE_BORROWED)
+VALUES ('B10', '30-12-2022', 17, '23-12-2020');
+
+INSERT INTO BORROWED_COLLECTION (BORROWED_ID, DATE_RETURNED, ART_OBJ_ID, DATE_BORROWED)
+VALUES ('B11','01-02-2017',19,'19-06-2013');
+```
+#### Queries
+1)Display the names of art objects of Dutch origin in chronological order
+```sql
+SELECT TITLE
+FROM ART_OBJECT
+WHERE ORIGIN= 'Dutch'
+ORDER BY TITLE ASC
+```
+2)Display the names of art objects dated before 1980
+```sql
+SELECT TITLE
+FROM ART_OBJECT
+WHERE YEAR < 1980;
+```
+3)Display Paintings drawn on Canvas
+```sql
+SELECT ID_NO,TITLE
+FROM ART_OBJECT,PAINTING
+WHERE ART_OBJECT.ID_NO = PAINTING.ART_OBJ_ID and DRAWN_ON='Canvas';
+```
+4)Display the conceptual art objects
+```sql
+SELECT *
+FROM ART_OBJECT
+WHERE STYLE='Conceptual';
+```
+5)Display the names of Art objects and artists of height under 2 m
+```sql
+SELECT TITLE,ARTIST_NAME
+FROM ART_OBJECT,SCULPTURE
+WHERE ART_OBJECT.ID_NO=SCULPTURE.ART_OBJ_ID AND
+         ID_NO IN (SELECT ART_OBJ_ID
+             FROM ART_OBJECT
+             WHERE  HEIGHT<2)
+```
+6)Display the names of artists and the origin of their art object also the date died (if they are not alive)
+```sql
+SELECT ARTIST_NAME,ORIGIN,DATE_DIED
+FROM ART_OBJECT,ARTIST
+WHERE ART_OBJECT.ARTIST_NAME=ARTIST.NAME;
+```
+7)Display the name of art objects and artists of the style ‘Baroque’
+```sql
+SELECT TITLE
+FROM ART_OBJECT
+WHERE STYLE='Baroque';
+SELECT NAME
+FROM ARTIST
+WHERE MAIN_STYLE='Baroque';
+```
+8)Display the art object and their description by the artists from Netherlands
+```sql
+SELECT DESCRIPTION,ID_NO
+FROM ART_OBJECT
+WHERE ARTIST_NAME IN (SELECT NAME
+                                                FROM ARTIST
+                                                 WHERE COUNTRY_OF_ORIGIN = 'Netherlands'
+                                               );
+```
+9)Display the names of oil paintings and their style in descending order of their id_no
+```sql
+SELECT A.TITLE,P.STYLE,A.ID_NO
+FROM ART_OBJECT A,PAINTING P
+WHERE A.ID_NO=P.ART_OBJ_ID
+     AND ART_OBJ_ID IN (SELECT ART_OBJ_ID
+                         FROM PAINTING
+                         WHERE PAINT_TYPE='Oil')
+ORDER BY ART_OBJ_ID DESC
+```
+10)Display the details of the oldest art object (id_no, title, description, year, origin and artist name )
+```sql
+SELECT *
+FROM ART_OBJECT
+WHERE YEAR=(SELECT MIN(YEAR)
+            FROM ART_OBJECT);
+```
+
+11)Display the count of oil paintings and spray paintings
+```sql
+SELECT PAINT_TYPE, COUNT(*) as Total_Count
+FROM PAINTING
+WHERE PAINT_TYPE IN ('Spray', 'Oil')
+GROUP BY PAINT_TYPE;
+```
+12)Add a new art object by Pablo Picasso to the database
+```sql
+INSERT INTO ART_OBJECT (ID_NO, YEAR, TITLE, DESCRIPTION, STYLE, ORIGIN, ARTIST_NAME)
+VALUES (21, 1910, 'The Old Guitarist', 'A painting of an old guitarist', 'Cubism', 'Spain', 'Pablo Picasso');
+```
+13)Display the artists with minimum no of art objects
+```sql
+SELECT ARTIST_NAME
+FROM ART_OBJECT
+GROUP BY ARTIST_NAME
+HAVING COUNT(*)=(SELECT MIN(COUNT(ARTIST_NAME))
+                 FROM ART_OBJECT
+                 GROUP BY ARTIST_NAME
+                 )
+```
+14)Retrieve the title, artist, and start and end dates of all exhibitions
+```sql
+SELECT ART_OBJECT.TITLE, ARTIST.NAME, EXHIBITION.START_DATE, EXHIBITION.END_DATE
+FROM ART_OBJECT
+JOIN ARTIST ON ART_OBJECT.ARTIST_NAME = ARTIST.NAME
+JOIN EXHIBITION ON ART_OBJECT.ID_NO = EXHIBITION.ART_OBJ_ID;
+```
+
+15)Display art objects names borrowed before 2015
+```sql
+SELECT ID_NO,TITLE
+FROM ART_OBJECT 
+JOIN BORROWED_COLLECTION
+ON ART_OBJECT.ID_NO=BORROWED_COLLECTION.ART_OBJ_ID
+WHERE EXTRACT (YEAR FROM TO_DATE(DATE_BORROWED)) < 2015
+```
+16)Display the art object details and collection details if they have any
+```sql
+SELECT ART_OBJECT.ID_NO, ART_OBJECT.TITLE, ART_OBJECT.YEAR, ART_OBJECT.DESCRIPTION, 
+ART_OBJECT.STYLE, ART_OBJECT.ORIGIN, ART_OBJECT.ARTIST_NAME,
+COLLECTION.NAME, COLLECTION.TYPE, COLLECTION.DESCRIPTION, COLLECTION.CONTACT_PERSON, 
+COLLECTION.PHONE, COLLECTION.ADDRESS
+FROM ART_OBJECT
+RIGHT JOIN COLLECTION ON ART_OBJECT.ID_NO = COLLECTION.ART_OBJ_ID;
+```
+17)Display the art objects name which are being exhibited
+```sql
+SELECT TITLE,NAME
+FROM ART_OBJECT,EXHIBITION
+WHERE ART_OBJECT.ID_NO=EXHIBITION.ART_OBJECT_ID
+```
+18)Retrieve permanent art objects of cost below 100000
+```sql
+SELECT *
+FROM ART_OBJECT,PERMANENT_COLLECTION
+WHERE ART_OBJECT.ID_NO=PERMANENT_COLLECTION.ART_OBJ_ID AND COST >100000;
+```
+19)Retrieve art object names which have been returned after 2020
+```sqlSELECT ID_NO,TITLE
+FROM ART_OBJECT 
+JOIN BORROWED_COLLECTION 
+ON ART_OBJECT.ID_NO=BORROWED_COLLECTION.ART_OBJ_ID
+WHERE EXTRACT (YEAR FROM TO_DATE(DATE_RETURNED)) > 2020
+```
+
+
